@@ -14,17 +14,15 @@ class CustomTable extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        print(table.tableNumber);
-        print( table.state);
+        Navigator.pushNamed(context, 'table-details', arguments: table);
       },
       child: Stack(
         alignment: Alignment.center,
         children: [
           Row(
-            mainAxisAlignment:
-                table.capacity > 4
-                    ? MainAxisAlignment.spaceEvenly
-                    : MainAxisAlignment.center,
+            mainAxisAlignment: table.capacity > 4
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.center,
             children: [
               _ChairVertical(width: size.width * 0.08),
               table.capacity > 4
@@ -32,30 +30,26 @@ class CustomTable extends StatelessWidget {
                   : SizedBox(),
             ],
           ),
-      
           table.capacity == 4
               ? _ChairHorizontal(width: customWidth + size.width * 0.035)
               : table.capacity > 4
-              ? _ChairHorizontal(width: customWidth + size.width * 0.09)
-              : SizedBox(),
-      
+                  ? _ChairHorizontal(width: customWidth + size.width * 0.09)
+                  : SizedBox(),
           table.capacity > 4
               ? _MainTable(
-                width: customWidth + size.width * 0.06,
-                height: customHeight,
-              )
+                  width: customWidth + size.width * 0.06,
+                  height: customHeight,
+                )
               : _MainTable(width: customWidth, height: customHeight),
-      
           Container(
             alignment: Alignment.center,
             height: 50,
             width: 50,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(100),
-              color:
-                  table.state == "available"
-                      ? Color.fromRGBO(39, 174, 96, 1.0)
-                      : table.state == "busy"
+              color: table.state == "available"
+                  ? Color.fromRGBO(39, 174, 96, 1.0)
+                  : table.state == "busy"
                       ? AppTheme.primaryColor
                       : Colors.black87,
             ),
@@ -80,7 +74,6 @@ class _MainTable extends StatelessWidget {
     return Container(
       height: height,
       width: width,
-
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
         color: const Color.fromARGB(255, 238, 199, 148),

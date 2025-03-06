@@ -1,24 +1,21 @@
-
-
-
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:meseros_app/shared_preferences/preference.dart';
 
-class MainProvider extends ChangeNotifier{
+class MainProvider extends ChangeNotifier {
   GlobalKey<FormState> loginKey = GlobalKey<FormState>();
   String username = "";
   String password = "";
   bool _isLoading = false;
   String backend = '${Preferences.ipServer}:${Preferences.port}';
-  List<String> meseros = [];
+  List<String> waitresses = [];
   int _currentOptNav = 0;
-  MainProvider(){
+  MainProvider() {
     getMeseros();
   }
-    //*------- NAV BAR ---------
+  //*------- NAV BAR ---------
   int get currentOptNav {
     return _currentOptNav;
   }
@@ -28,23 +25,25 @@ class MainProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-    getMeseros() async{
-    final url = Uri.http(backend, 'meseros/get-meseros');
-    try{
-    final response = await http.get(url);
+  getMeseros() async {
+    final url = Uri.http(backend, 'tables/get-waitresses');
+    try {
+      final response = await http.get(url);
       // print(jsonDecode(response.body));
       final data = await jsonDecode(response.body);
-      meseros = data.map<String>((e)=>e['name'].toString()).toList();
+      waitresses =
+          data.map<String>((waitress) => waitress['name'].toString()).toList();
       // print(data);
       notifyListeners();
-    }catch(e){
+    } catch (e) {
       print(e);
     }
   }
 
-  Future<bool> validateUser(String user, String passwd) async {
-    final url = Uri.http(backend, 'meseros/validate-mesero',{'name': user, 'password':passwd});
-    print(url);
+  Future<bool> validateUser(String user, String? passwd) async {
+    final url = Uri.http(backend, 'tables/validate-waitress',
+        {'name': user, 'password': passwd ?? ''});
+
     // final Map<String, String> data = {'usuario': user, 'password': passwd};
     try {
       final response = await http.post(url);
@@ -68,5 +67,4 @@ class MainProvider extends ChangeNotifier{
 
     return loginKey.currentState?.validate() ?? false;
   }
-
 }

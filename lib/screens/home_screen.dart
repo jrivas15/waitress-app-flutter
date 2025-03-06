@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meseros_app/providers/table_provider.dart';
 import 'package:meseros_app/screens/tables_screen.dart';
 import 'package:meseros_app/widgets/custom_bottom_nav.dart';
 import 'package:provider/provider.dart';
@@ -17,12 +18,11 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-
 class _SwitchScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mainProvider = Provider.of<MainProvider>(context);
-    // final dataProvider = Provider.of<DataProvider>(context, listen: false);
+    final tableProvider = Provider.of<TableProvider>(context, listen: false);
     final currentIndex = mainProvider.currentOptNav;
     switch (currentIndex) {
       case 0:
@@ -33,6 +33,7 @@ class _SwitchScreen extends StatelessWidget {
         return StatsScreen();
       case 1:
         // dataProvider.getCategories();
+        tableProvider.getZones();
         return const TablesScreen();
       default:
         return const StatsScreen();

@@ -4,11 +4,12 @@ import 'package:meseros_app/providers/table_provider.dart';
 import 'package:meseros_app/screens/home_screen.dart';
 import 'package:meseros_app/screens/login_screen.dart';
 import 'package:meseros_app/screens/preferences_screen.dart';
+import 'package:meseros_app/screens/table_details.dart';
 import 'package:meseros_app/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:meseros_app/shared_preferences/preference.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Preferences.init();
   runApp(const MainApp());
@@ -41,11 +42,10 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.theme,
       routes: {
         'login': (_) => LoginScreen(),
-        'preferences': (_)=> SettingsScreen(),
-        '/' : (_)=> HomeScreen()
+        'preferences': (_) => SettingsScreen(),
+        '/': (_) => HomeScreen(),
+        'table-details': (_) => TableDetails()
       },
-
-     
     );
   }
 }
