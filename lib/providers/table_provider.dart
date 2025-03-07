@@ -9,9 +9,18 @@ class TableProvider extends ChangeNotifier {
   List<TableModel> tables = [];
   ZonesModel _selectedZone = ZonesModel(id: 0, name: 'Todas');
   List<ZonesModel> zones = [];
+  int _currentOptNav = 0;
+
+  //*------- NAV BAR ---------
+  int get currentOptNav => _currentOptNav;
+
+  set currentOptNav(int currentIndex) {
+    _currentOptNav = currentIndex;
+    notifyListeners();
+  }
+  //*------- Zones ---------
 
   ZonesModel get selectedZone => _selectedZone;
-
   set selectedZone(ZonesModel zone) {
     _selectedZone = zone;
     notifyListeners();

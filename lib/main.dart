@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meseros_app/providers/main_provider.dart';
+import 'package:meseros_app/providers/product_provider.dart';
 import 'package:meseros_app/providers/table_provider.dart';
 import 'package:meseros_app/screens/home_screen.dart';
 import 'package:meseros_app/screens/login_screen.dart';
@@ -23,8 +24,17 @@ class MainApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (context) => MainProvider(), lazy: false),
-        ChangeNotifierProvider(create: (context) => TableProvider(), lazy: true)
+          create: (context) => MainProvider(),
+          lazy: false,
+        ),
+        ChangeNotifierProvider(
+          create: (context) => TableProvider(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ProductProvider(),
+          lazy: true,
+        ),
       ],
       child: const MyApp(),
     );
@@ -44,7 +54,7 @@ class MyApp extends StatelessWidget {
         'login': (_) => LoginScreen(),
         'preferences': (_) => SettingsScreen(),
         '/': (_) => HomeScreen(),
-        'table-details': (_) => TableDetails()
+        'table-details': (_) => TableDetails(),
       },
     );
   }

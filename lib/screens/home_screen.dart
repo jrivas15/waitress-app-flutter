@@ -26,10 +26,6 @@ class _SwitchScreen extends StatelessWidget {
     final currentIndex = mainProvider.currentOptNav;
     switch (currentIndex) {
       case 0:
-        // dataProvider.getBalanceVentas();
-        // dataProvider.get10Sells();
-        // dataProvider.getPaymentStats();
-        // dataProvider.getInfoGeneral();
         return StatsScreen();
       case 1:
         // dataProvider.getCategories();
