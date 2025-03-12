@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meseros_app/providers/main_provider.dart';
+import 'package:meseros_app/providers/order_provider.dart';
 import 'package:meseros_app/providers/product_provider.dart';
 import 'package:meseros_app/providers/table_provider.dart';
 import 'package:meseros_app/screens/home_screen.dart';
@@ -33,6 +34,10 @@ class MainApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => ProductProvider(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (context) => OrderProvider(),
           lazy: true,
         ),
       ],

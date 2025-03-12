@@ -18,8 +18,6 @@ class TablesScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Column(
-          // crossAxisAlignment: CrossAxisAlignment.center,
-          // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               selectedZone.id == 0 ? 'Seleccione una zona' : selectedZone.name,

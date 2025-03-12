@@ -34,7 +34,10 @@ class _CategoryCard extends StatelessWidget {
     final productProvider = Provider.of<ProductProvider>(context);
     final CategoryModel? selectedCategory = productProvider.selectedCategory;
     return GestureDetector(
-      onTap: () => productProvider.selectedCategory = category,
+      onTap: () {
+        productProvider.selectedCategory = category;
+        productProvider.getProductByCategory(category);
+      },
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
         width: 140,

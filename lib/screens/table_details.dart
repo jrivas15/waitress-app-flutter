@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:meseros_app/models/table_model.dart';
+import 'package:meseros_app/providers/order_provider.dart';
 import 'package:meseros_app/providers/table_provider.dart';
 import 'package:meseros_app/screens/order_details.dart';
 import 'package:meseros_app/screens/select_products.dart';
-import 'package:meseros_app/theme/app_theme.dart';
+// import 'package:meseros_app/theme/app_theme.dart';
 import 'package:meseros_app/widgets/custom_table.dart';
 import 'package:provider/provider.dart';
 
@@ -55,6 +56,8 @@ class _TableNavigationBart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tableProvider = Provider.of<TableProvider>(context, listen: false);
+    final orderProvider = Provider.of<OrderProvider>(context);
+
     return BottomNavigationBar(
       backgroundColor: const Color.fromRGBO(25, 25, 25, 1),
       currentIndex: tableProvider.currentOptNav,
@@ -68,7 +71,7 @@ class _TableNavigationBart extends StatelessWidget {
         ),
         BottomNavigationBarItem(
           icon: Badge.count(
-            count: 0,
+            count: orderProvider.orderItems.length,
             child: const Icon(Icons.shopping_bag_rounded),
           ),
           label: '',
