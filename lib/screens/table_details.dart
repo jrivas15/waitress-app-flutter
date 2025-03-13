@@ -15,33 +15,26 @@ class TableDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final TableModel table =
         ModalRoute.of(context)!.settings.arguments as TableModel;
-    final tableProvider = Provider.of<TableProvider>(context);
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          spacing: 15,
-          children: [
-            _InfoTable(table: table, tableProvider: tableProvider),
-            _SwitchScreen(),
-          ],
-        ),
-      ),
+      body: SafeArea(child: _SwitchScreen(table: table)),
       bottomNavigationBar: _TableNavigationBart(),
     );
   }
 }
 
 class _SwitchScreen extends StatelessWidget {
-  const _SwitchScreen();
+  final TableModel table;
+
+  const _SwitchScreen({required this.table});
 
   @override
   Widget build(BuildContext context) {
-    final tableProvider = Provider.of<TableProvider>(context, listen: false);
+    final tableProvider = Provider.of<TableProvider>(context);
     final currentIndex = tableProvider.currentOptNav;
 
     switch (currentIndex) {
       case 0:
-        return SelectProducts();
+        return Column(children: [_InfoTable(table: table), SelectProducts()]);
       case 1:
         return OrderDetails();
       default:
@@ -55,7 +48,7 @@ class _TableNavigationBart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tableProvider = Provider.of<TableProvider>(context, listen: false);
+    final tableProvider = Provider.of<TableProvider>(context);
     final orderProvider = Provider.of<OrderProvider>(context);
 
     return BottomNavigationBar(
@@ -84,13 +77,14 @@ class _TableNavigationBart extends StatelessWidget {
 }
 
 class _InfoTable extends StatelessWidget {
-  const _InfoTable({required this.table, required this.tableProvider});
-
   final TableModel table;
-  final TableProvider tableProvider;
+
+  const _InfoTable({required this.table});
 
   @override
   Widget build(BuildContext context) {
+    final tableProvider = Provider.of<TableProvider>(context);
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       padding: EdgeInsets.all(2),
@@ -101,14 +95,23 @@ class _InfoTable extends StatelessWidget {
       child: Row(
         spacing: 10,
         children: [
-          BackButton(),
+          BackButton(
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/');
+              final orderProvider = Provider.of<OrderProvider>(
+                context,
+                listen: false,
+              );
+              orderProvider.resetOrder();
+            },
+          ),
           CustomTable(table: table),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Mesa: ${table.tableNumber}'),
               Text('Zona: ${tableProvider.selectedZone.name}'),
-              Text('Atendida por: ${table.state}'),
+              Text('Atendida por: ${table.waitress}'),
             ],
           ),
         ],

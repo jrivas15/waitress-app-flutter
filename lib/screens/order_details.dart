@@ -12,7 +12,8 @@ class OrderDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final orderProvider = Provider.of<OrderProvider>(context);
 
-    return Expanded(
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
       child: Column(
         children: [
           Text('Cuenta', style: AppTheme.titleStyle),
@@ -20,18 +21,28 @@ class OrderDetails extends StatelessWidget {
           Expanded(
             child: SizedBox(
               width: double.infinity,
-              // color: Colors.blue,
-              // child: Column(children: [_OrderItemCard(),]),
               child: ListView.builder(
                 itemCount: orderProvider.orderItems.length,
                 itemBuilder: (_, int i) {
                   if (orderProvider.currentOrder == null) {
-                    orderProvider.orderItems[i].id = i;
+                    orderProvider.orderItems[i].id = -i;
                   }
                   return _OrderItemCard(orderItem: orderProvider.orderItems[i]);
                 },
               ),
             ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: Text(
+              'Total \$ ${formatNumber(0)}',
+              textAlign: TextAlign.right,
+              style: AppTheme.titleStyle,
+            ),
+          ),
+          ElevatedButton(
+            onPressed: orderProvider.orderItems.isEmpty ? null : () {},
+            child: Text('Enviar comanda', style: TextStyle(fontSize: 18)),
           ),
         ],
       ),
@@ -47,9 +58,12 @@ class _OrderItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onDoubleTap: () {
-        print('editar producto');
-      },
+      onDoubleTap:
+          orderItem.state != 'pending'
+              ? null
+              : () {
+                print('editar producto');
+              },
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Container(
@@ -79,7 +93,7 @@ class _OrderItemCard extends StatelessWidget {
               const SizedBox(width: 1),
               _Image(),
               _InfoProduct(orderItem: orderItem),
-              _BtnActions(orderID: orderItem.id!),
+              _BtnActions(orderItem: orderItem),
             ],
           ),
         ),
@@ -89,33 +103,53 @@ class _OrderItemCard extends StatelessWidget {
 }
 
 class _BtnActions extends StatelessWidget {
-  final int orderID;
+  final OrderItemModel orderItem;
 
-  const _BtnActions({required this.orderID});
+  const _BtnActions({required this.orderItem});
   @override
   Widget build(BuildContext context) {
     final orderProvider = Provider.of<OrderProvider>(context);
     return Row(
       children: [
-        IconButton.filled(
-          onPressed: () => orderProvider.removeProduct(orderID),
-          icon: Icon(Icons.remove),
-          style: IconButton.styleFrom(
-            backgroundColor: AppTheme.primaryColor,
-            foregroundColor: Colors.white,
-          ),
+        _CustomIconButton(
+          color: AppTheme.primaryColor,
+          fx: () => orderProvider.removeProduct(orderItem.id!),
+          icon: Icons.remove,
+          state: orderItem.state,
         ),
-        IconButton.filled(
-          onPressed: () {
-            orderProvider.addToSameProduct(orderID);
-          },
-          icon: Icon(Icons.add),
-          style: IconButton.styleFrom(
-            backgroundColor: Colors.green,
-            foregroundColor: Colors.white,
-          ),
+        _CustomIconButton(
+          color: Colors.green,
+          fx: () => orderProvider.addToSameProduct(orderItem.id!),
+          icon: Icons.add,
+          state: orderItem.state,
         ),
       ],
+    );
+  }
+}
+
+class _CustomIconButton extends StatelessWidget {
+  final Color color;
+  final VoidCallback fx;
+  final IconData icon;
+  final dynamic state;
+  const _CustomIconButton({
+    required this.color,
+    required this.fx,
+    required this.icon,
+    required this.state,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton.filled(
+      onPressed: state != 'pending' ? null : fx,
+      // onPressed: null,
+      icon: Icon(icon),
+      style: IconButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+      ),
     );
   }
 }
@@ -131,8 +165,8 @@ class _InfoProduct extends StatelessWidget {
       // "Con cebolla",
       // "Extra queso",
       // "Extra queso",
-      // "Extra queso",
-      // "Extra queso",
+      "Extra queso",
+      "Extra queso",
       // "Extra queso",
     ];
     return Expanded(
@@ -170,6 +204,7 @@ class _InfoProduct extends StatelessWidget {
               : SizedBox(),
           Text('Nota: ${orderItem.note ?? " "}'),
           Text('\$ ${formatNumber(orderItem.subtotal)}'),
+          Text('Estado: ${orderItem.state}'),
         ],
       ),
     );
@@ -177,7 +212,7 @@ class _InfoProduct extends StatelessWidget {
 }
 
 class _Image extends StatelessWidget {
-  const _Image();
+  // const _Image();
 
   @override
   Widget build(BuildContext context) {

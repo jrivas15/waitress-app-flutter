@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:meseros_app/models/table_model.dart';
+import 'package:meseros_app/providers/order_provider.dart';
 import 'package:meseros_app/theme/app_theme.dart';
+import 'package:provider/provider.dart';
 
 class CustomTable extends StatelessWidget {
   final TableModel table;
@@ -11,18 +14,29 @@ class CustomTable extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     final customHeight = size.height * 0.08;
     final customWidth = size.width * 0.20;
+    final Logger logger = Logger();
 
     return GestureDetector(
       onTap: () {
+        // table
+        logger.i(table.order);
+        final orderProvider = Provider.of<OrderProvider>(
+          context,
+          listen: false,
+        );
+        if (table.order != null) {
+          orderProvider.getOrderItems(table.order!);
+        }
         Navigator.pushNamed(context, 'table-details', arguments: table);
       },
       child: Stack(
         alignment: Alignment.center,
         children: [
           Row(
-            mainAxisAlignment: table.capacity > 4
-                ? MainAxisAlignment.spaceEvenly
-                : MainAxisAlignment.center,
+            mainAxisAlignment:
+                table.capacity > 4
+                    ? MainAxisAlignment.spaceEvenly
+                    : MainAxisAlignment.center,
             children: [
               _ChairVertical(width: size.width * 0.08),
               table.capacity > 4
@@ -33,13 +47,13 @@ class CustomTable extends StatelessWidget {
           table.capacity == 4
               ? _ChairHorizontal(width: customWidth + size.width * 0.035)
               : table.capacity > 4
-                  ? _ChairHorizontal(width: customWidth + size.width * 0.09)
-                  : SizedBox(),
+              ? _ChairHorizontal(width: customWidth + size.width * 0.09)
+              : SizedBox(),
           table.capacity > 4
               ? _MainTable(
-                  width: customWidth + size.width * 0.06,
-                  height: customHeight,
-                )
+                width: customWidth + size.width * 0.06,
+                height: customHeight,
+              )
               : _MainTable(width: customWidth, height: customHeight),
           Container(
             alignment: Alignment.center,
@@ -47,9 +61,10 @@ class CustomTable extends StatelessWidget {
             width: 50,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(100),
-              color: table.state == "available"
-                  ? Color.fromRGBO(39, 174, 96, 1.0)
-                  : table.state == "busy"
+              color:
+                  table.state == "available"
+                      ? Color.fromRGBO(39, 174, 96, 1.0)
+                      : table.state == "busy"
                       ? AppTheme.primaryColor
                       : Colors.black87,
             ),

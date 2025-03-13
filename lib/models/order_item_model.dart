@@ -19,6 +19,7 @@ class OrderItemModel {
   int quantity;
   int? order;
   dynamic note;
+  dynamic state;
   ProductModel product;
   double subtotal;
 
@@ -27,6 +28,7 @@ class OrderItemModel {
     required this.quantity,
     this.order,
     required this.note,
+    required this.state,
     required this.product,
     required this.subtotal,
   });
@@ -35,6 +37,7 @@ class OrderItemModel {
     id: json["id"],
     quantity: json["quantity"],
     order: json["order"],
+    state: json["state"],
     note: json["note"],
     product: ProductModel.fromJson(json["product"]),
     subtotal: json["subtotal"],
@@ -44,6 +47,7 @@ class OrderItemModel {
     "id": id,
     "quantity": quantity,
     "order": order,
+    "state": state,
     "note": note,
     "product": product.toJson(),
     "subtotal": subtotal,

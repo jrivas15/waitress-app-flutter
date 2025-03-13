@@ -16,6 +16,8 @@ class TableModel {
   int capacity;
   int zone;
   String state;
+  int? waitress;
+  int? order;
 
   TableModel({
     required this.id,
@@ -23,21 +25,27 @@ class TableModel {
     required this.capacity,
     required this.zone,
     required this.state,
+    this.waitress,
+    this.order,
   });
 
   factory TableModel.fromJson(Map<String, dynamic> json) => TableModel(
-        id: json["id"],
-        tableNumber: json["table_number"],
-        capacity: json["capacity"],
-        zone: json["zone"],
-        state: json["state"],
-      );
+    id: json["id"],
+    tableNumber: json["table_number"],
+    capacity: json["capacity"],
+    zone: json["zone"],
+    state: json["state"],
+    waitress: json["waitress"],
+    order: json["order"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "table_number": tableNumber,
-        "capacity": capacity,
-        "zone": zone,
-        "state": state,
-      };
+    "id": id,
+    "table_number": tableNumber,
+    "capacity": capacity,
+    "zone": zone,
+    "state": state,
+    "waitress": waitress,
+    "order": order,
+  };
 }
