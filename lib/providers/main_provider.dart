@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:meseros_app/models/stasts_models.dart';
 import 'package:meseros_app/models/waitress_model.dart';
 import 'package:meseros_app/shared_preferences/preference.dart';
 
@@ -15,7 +16,7 @@ class MainProvider extends ChangeNotifier {
   int _currentOptNav = 0;
   WaitressModel? waitress;
   Logger logger = Logger();
-
+  List<StatsModel> stats = [];
   MainProvider() {
     getMeseros();
   }
@@ -74,5 +75,16 @@ class MainProvider extends ChangeNotifier {
     // print(formKey.currentState?.validate());
 
     return loginKey.currentState?.validate() ?? false;
+  }
+
+  getStats() async {
+    final url = Uri.http(backend, 'tables/stats');
+    try {
+      final response = await http.get(url);
+      stats = statsModelFromJson(response.body);
+      notifyListeners();
+    } catch (e) {
+      logger.e(e);
+    }
   }
 }

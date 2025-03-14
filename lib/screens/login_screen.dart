@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meseros_app/providers/main_provider.dart';
+import 'package:meseros_app/theme/app_theme.dart';
+import 'package:meseros_app/widgets/authbackground.dart';
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -9,15 +11,29 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.black54,
-          onPressed: () {
-            Navigator.pushNamed(context, 'preferences');
-          },
-          child: const Icon(
-            Icons.settings_outlined,
-            color: Colors.white,
-          )),
-      body: Column(
+        backgroundColor: Colors.black54,
+        onPressed: () {
+          Navigator.pushNamed(context, 'preferences');
+        },
+        child: const Icon(Icons.settings_outlined, color: Colors.white),
+      ),
+      body: AuthBackground(
+        child: SingleChildScrollView(
+          child: Column(children: [const SizedBox(height: 220), _CardLogin()]),
+        ),
+      ),
+    );
+  }
+}
+
+class _CardLogin extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: _customDecoration(),
+      height: 300,
+      margin: EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -25,17 +41,23 @@ class LoginScreen extends StatelessWidget {
             width: double.infinity,
             child: Text(
               'Bienvenido',
-              style: TextStyle(
-                fontSize: 25,
-              ),
+              style: TextStyle(fontSize: 25),
               textAlign: TextAlign.center,
             ),
           ),
-          _Formulario()
+          _Formulario(),
         ],
       ),
     );
   }
+
+  BoxDecoration _customDecoration() => BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(20),
+    boxShadow: [
+      BoxShadow(color: Colors.black26, spreadRadius: 5, blurRadius: 6),
+    ],
+  );
 }
 
 class _Formulario extends StatelessWidget {
@@ -46,68 +68,72 @@ class _Formulario extends StatelessWidget {
     final mainProvider = Provider.of<MainProvider>(context);
 
     void enterToApp() {
+      mainProvider.getStats();
       Navigator.pushReplacementNamed(context, '/');
-      // final mainProvider = Provider.of<MainProvider>(context, listen: false);
-      // mainProvider.getMovimientos();
     }
 
-    // void showMSG(String title, String msg) {
-    //   showDialog(
-    //       context: context,
-    //       builder: (context) {
-    //         return InfoDLG(title: title, text: msg);
-    //       });
-    // }
-
     return Form(
-        key: mainProvider.loginKey,
-        child: Container(
-          width: double.infinity,
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              DropdownButtonFormField(
-                items: mainProvider.waitresses != []
-                    ? mainProvider.waitresses
-                        .map((user) => DropdownMenuItem(
+      key: mainProvider.loginKey,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            DropdownButtonFormField(
+              decoration: AppTheme.normalInputDecoration(
+                labelText: 'Usuario',
+                hintText: 'Seleccionar usuario',
+              ),
+              items:
+                  mainProvider.waitresses != []
+                      ? mainProvider.waitresses
+                          .map(
+                            (user) => DropdownMenuItem(
                               value: user,
                               child: Text(user),
-                            ))
-                        .toList()
-                    : [
+                            ),
+                          )
+                          .toList()
+                      : [
                         const DropdownMenuItem(
-                            value: 'Sin conexion!',
-                            child: Text('Sin conexion!'))
-                      ]
-                // loginForm.usernames.map((user) => DropdownMenuItem(child: Text(data),value: ,))
-                ,
-                onChanged: (value) => mainProvider.username = value.toString(),
-                onSaved: (value) => mainProvider.username = value.toString(),
-                validator: (value) => value != null ? null : '*Campo requerido',
-                autovalidateMode: AutovalidateMode.always,
+                          value: 'Sin conexion!',
+                          child: Text('Sin conexion!'),
+                        ),
+                      ],
+              // loginForm.usernames.map((user) => DropdownMenuItem(child: Text(data),value: ,))
+              onChanged: (value) => mainProvider.username = value.toString(),
+              onSaved: (value) => mainProvider.username = value.toString(),
+              validator: (value) => value != null ? null : '*Campo requerido',
+              autovalidateMode: AutovalidateMode.always,
+            ),
+            TextFormField(
+              keyboardType: TextInputType.number,
+              maxLength: 4,
+              onChanged:
+                  (value) =>
+                      mainProvider.password =
+                          value, // Actualizar el valor del formulario
+              autocorrect: false,
+              obscureText: true,
+              cursorColor: AppTheme.primaryColor,
+              decoration: AppTheme.normalInputDecoration(
+                labelText: 'Contraseña',
+                hintText: 'Ingrese su contraseña',
               ),
-              TextFormField(
-                keyboardType: TextInputType.number,
-                maxLength: 4,
-                onChanged: (value) => mainProvider.password =
-                    value, // Actualizar el valor del formulario
-                autocorrect: false,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Contraseña',
-                  hintText: 'Ingrese su contraseña',
-                ),
-              ),
-              MaterialButton(
-                onPressed: mainProvider.isLoading
-                    ? null
-                    : () async {
+            ),
+            ElevatedButton(
+              onPressed:
+                  mainProvider.isLoading
+                      ? null
+                      : () async {
                         FocusScope.of(context).unfocus();
                         mainProvider.isLoading = true;
                         if (mainProvider.isValidForm()) {
                           mainProvider.isLoading = true;
                           bool isOk = await mainProvider.validateUser(
-                              mainProvider.username, mainProvider.password);
+                            mainProvider.username,
+                            mainProvider.password,
+                          );
                           if (isOk) {
                             enterToApp();
                           } else {
@@ -118,20 +144,21 @@ class _Formulario extends StatelessWidget {
                           mainProvider.isLoading = false;
                         }
                       },
-                disabledColor: Colors.grey,
-                color: Colors.indigo,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10)),
-                child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 10),
-                    child: Text(
-                        mainProvider.isLoading ? 'Ingresando...' : 'Login',
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 20))),
+
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 10,
+                ),
+                child: Text(
+                  mainProvider.isLoading ? 'Ingresando...' : 'Login',
+                  style: const TextStyle(color: Colors.white, fontSize: 20),
+                ),
               ),
-            ],
-          ),
-        ));
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

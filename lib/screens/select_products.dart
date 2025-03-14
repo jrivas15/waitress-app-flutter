@@ -57,7 +57,7 @@ class _ProductCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         print(product.name);
-
+        print('${orderProvider.backend}${product.image}');
         orderProvider.addOrderItem(product);
       },
       child: ClipRRect(
@@ -79,8 +79,13 @@ class _ProductCard extends StatelessWidget {
                 color: const Color.fromARGB(96, 152, 152, 152),
                 child: FadeInImage(
                   placeholder: AssetImage('assets/no-image.jpg'),
-                  image: AssetImage('assets/no-image.jpg'),
-                  fit: BoxFit.contain,
+                  image:
+                      product.image != null
+                          ? NetworkImage(
+                            'http://${orderProvider.backend}${product.image}',
+                          )
+                          : AssetImage('assets/no-image.jpg'),
+                  fit: BoxFit.cover,
                 ),
               ),
               Padding(

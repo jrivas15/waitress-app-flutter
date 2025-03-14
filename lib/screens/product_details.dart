@@ -21,24 +21,26 @@ class ProductDetails extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _Image(size: size),
+            _Image(size: size, product: product),
             SizedBox(
               width: double.infinity,
               child: Column(
                 children: [
                   Text(product.name, style: AppTheme.titleStyle),
-                  Container(
-                    margin: EdgeInsets.only(left: 10),
-                    width: double.infinity,
-                    child: Text(
-                      "Modificadores",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.start,
-                    ),
-                  ),
+                  productProvider.listModifiers.isNotEmpty
+                      ? Container(
+                        margin: EdgeInsets.only(left: 10),
+                        width: double.infinity,
+                        child: Text(
+                          "Modificadores",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.start,
+                        ),
+                      )
+                      : const SizedBox(),
                   _ModifiersOptions(listModifiers: listModifiers),
                   _TextArea(),
                   ElevatedButton(
@@ -131,16 +133,30 @@ class _ModifiersOptions extends StatelessWidget {
 }
 
 class _Image extends StatelessWidget {
-  const _Image({required this.size});
-
+  const _Image({required this.size, required this.product});
+  final ProductModel product;
   final Size size;
 
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    );
     return Container(
       width: double.infinity,
       height: size.height * 0.35,
       color: Colors.grey,
+      child: FadeInImage(
+        placeholder: AssetImage('assets/no-image.jpg'),
+        image:
+            product.image != null
+                ? NetworkImage(
+                  'http://${productProvider.backend}${product.image}',
+                )
+                : AssetImage('assets/no-image.jpg'),
+        fit: BoxFit.cover,
+      ),
     );
   }
 }

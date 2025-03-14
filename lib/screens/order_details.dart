@@ -125,7 +125,7 @@ class _OrderItemCard extends StatelessWidget {
               ),
               Text('x'),
               const SizedBox(width: 1),
-              _Image(),
+              _Image(orderItem: orderItem),
               _InfoProduct(orderItem: orderItem),
               _BtnActions(orderItem: orderItem),
             ],
@@ -247,10 +247,15 @@ class _InfoProduct extends StatelessWidget {
 }
 
 class _Image extends StatelessWidget {
-  // const _Image();
+  final OrderItemModel orderItem;
+  const _Image({required this.orderItem});
 
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    );
     return Container(
       margin: EdgeInsets.only(right: 3),
       width: 90,
@@ -258,6 +263,16 @@ class _Image extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.black38,
         borderRadius: BorderRadius.circular(10),
+      ),
+      child: FadeInImage(
+        placeholder: AssetImage('assets/no-image.jpg'),
+        image:
+            orderItem.product.image != null
+                ? NetworkImage(
+                  'http://${productProvider.backend}${orderItem.product.image}',
+                )
+                : AssetImage('assets/no-image.jpg'),
+        fit: BoxFit.cover,
       ),
     );
   }

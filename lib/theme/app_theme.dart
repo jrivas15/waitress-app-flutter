@@ -4,8 +4,10 @@ class AppTheme {
   // static const Color primaryColor = Color.fromRGBO(214, 48, 49, 1);
   static const Color primaryColor = Color.fromRGBO(179, 57, 57, 1.0);
 
-  static const Color secundaryColor = Colors.white;
+  static const Color secundaryColor = Color.fromARGB(255, 216, 216, 216);
   static final ThemeData theme = ThemeData.light().copyWith(
+    primaryColor: primaryColor,
+    scaffoldBackgroundColor: const Color.fromARGB(255, 255, 255, 255),
     //*App bar
     appBarTheme: const AppBarTheme(
       elevation: 0,
@@ -57,6 +59,11 @@ class AppTheme {
     color: primaryColor,
   );
 
+  static BoxDecoration simpleCardDecoration = BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(25),
+    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 15)],
+  );
   //*----------- SHADOW -------------
 
   static BoxShadow boxShadowCards = const BoxShadow(
