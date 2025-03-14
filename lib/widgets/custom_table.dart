@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:meseros_app/models/table_model.dart';
 import 'package:meseros_app/providers/order_provider.dart';
+import 'package:meseros_app/providers/product_provider.dart';
 import 'package:meseros_app/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
@@ -17,7 +18,7 @@ class CustomTable extends StatelessWidget {
     final Logger logger = Logger();
 
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         // table
         logger.i(table.order);
         final orderProvider = Provider.of<OrderProvider>(
@@ -27,6 +28,11 @@ class CustomTable extends StatelessWidget {
         if (table.order != null) {
           orderProvider.getOrderItems(table.order!);
         }
+        final productProvider = Provider.of<ProductProvider>(
+          context,
+          listen: false,
+        );
+        productProvider.getCategories();
         Navigator.pushNamed(context, 'table-details', arguments: table);
       },
       child: Stack(

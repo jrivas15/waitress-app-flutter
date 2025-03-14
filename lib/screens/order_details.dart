@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:meseros_app/models/order_item_model.dart';
-import 'package:meseros_app/providers/order_provider.dart';
+import 'package:meseros_app/models/table_model.dart';
+import 'package:meseros_app/providers/providers.dart';
 import 'package:meseros_app/theme/app_theme.dart';
 import 'package:meseros_app/utils/utils.dart';
+import 'package:meseros_app/widgets/dialogs.dart';
 import 'package:provider/provider.dart';
 
 class OrderDetails extends StatelessWidget {
-  const OrderDetails({super.key});
+  final TableModel table;
+  const OrderDetails({super.key, required this.table});
 
   @override
   Widget build(BuildContext context) {
     final orderProvider = Provider.of<OrderProvider>(context);
+
+    navToHome() => Navigator.pushReplacementNamed(context, '/');
+
+    sendBill() async {
+      bool ok = await orderProvider.updateOrderItems();
+      ok ? navToHome() : null;
+    }
+
+    newOrder() {
+      final mainProvider = Provider.of<MainProvider>(context, listen: false);
+      table.waitress = mainProvider.waitress!.id;
+      orderProvider.newOrder(table: table);
+    }
 
     return Padding(
       padding: const EdgeInsets.all(4.0),
@@ -24,7 +40,7 @@ class OrderDetails extends StatelessWidget {
               child: ListView.builder(
                 itemCount: orderProvider.orderItems.length,
                 itemBuilder: (_, int i) {
-                  if (orderProvider.currentOrder == null) {
+                  if (orderProvider.orderItems[i].id == null) {
                     orderProvider.orderItems[i].id = -i;
                   }
                   return _OrderItemCard(orderItem: orderProvider.orderItems[i]);
@@ -35,13 +51,18 @@ class OrderDetails extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: Text(
-              'Total \$ ${formatNumber(0)}',
+              'Total \$ ${formatNumber(orderProvider.totalOrderPrice)}',
               textAlign: TextAlign.right,
               style: AppTheme.titleStyle,
             ),
           ),
           ElevatedButton(
-            onPressed: orderProvider.orderItems.isEmpty ? null : () {},
+            onPressed:
+                orderProvider.orderItems.isEmpty
+                    ? null
+                    : () async {
+                      table.order != null ? await sendBill() : newOrder();
+                    },
             child: Text('Enviar comanda', style: TextStyle(fontSize: 18)),
           ),
         ],
@@ -57,13 +78,26 @@ class _OrderItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final productProvider = Provider.of<ProductProvider>(
+      context,
+      listen: false,
+    );
+
+    onDoubleTap() {
+      Provider.of<OrderProvider>(context, listen: false).currOrderItemID =
+          orderItem.id!;
+      productProvider.currModifiers = orderItem.modifiers;
+      productProvider.currNote = orderItem.note;
+      productProvider.getModifiers(orderItem.product.id);
+      Navigator.pushNamed(
+        context,
+        'product-details',
+        arguments: orderItem.product,
+      );
+    }
+
     return GestureDetector(
-      onDoubleTap:
-          orderItem.state != 'pending'
-              ? null
-              : () {
-                print('editar producto');
-              },
+      onDoubleTap: orderItem.state != 'pending' ? null : () => onDoubleTap(),
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Container(
@@ -113,7 +147,16 @@ class _BtnActions extends StatelessWidget {
       children: [
         _CustomIconButton(
           color: AppTheme.primaryColor,
-          fx: () => orderProvider.removeProduct(orderItem.id!),
+          fx: () {
+            orderItem.quantity == 1
+                ? QuestionDialog.displayAlert(
+                  context: context,
+                  content: 'Esta seguro que desea eliminar este producto?',
+                  title: 'Eliminar',
+                  fx: () => orderProvider.removeProduct(orderItem.id!),
+                )
+                : orderProvider.removeProduct(orderItem.id!);
+          },
           icon: Icons.remove,
           state: orderItem.state,
         ),
@@ -161,14 +204,6 @@ class _InfoProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<String> modifiers = [
-      // "Con cebolla",
-      // "Extra queso",
-      // "Extra queso",
-      "Extra queso",
-      "Extra queso",
-      // "Extra queso",
-    ];
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -185,10 +220,10 @@ class _InfoProduct extends StatelessWidget {
             ),
           ),
 
-          modifiers.isNotEmpty
+          orderItem.modifiers.isNotEmpty
               ? Wrap(
                 children: List.generate(
-                  modifiers.length,
+                  orderItem.modifiers.length,
                   (i) => Row(
                     children: [
                       Icon(
@@ -196,7 +231,7 @@ class _InfoProduct extends StatelessWidget {
                         color: Colors.amberAccent,
                         size: 17,
                       ),
-                      Text(modifiers[i]),
+                      Text(orderItem.modifiers[i].name),
                     ],
                   ),
                 ),

@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:meseros_app/providers/main_provider.dart';
-import 'package:meseros_app/providers/order_provider.dart';
-import 'package:meseros_app/providers/product_provider.dart';
-import 'package:meseros_app/providers/table_provider.dart';
-import 'package:meseros_app/screens/home_screen.dart';
-import 'package:meseros_app/screens/login_screen.dart';
-import 'package:meseros_app/screens/preferences_screen.dart';
-import 'package:meseros_app/screens/table_details.dart';
+import 'package:meseros_app/providers/providers.dart';
+import 'package:meseros_app/screens/screens.dart';
+import 'package:meseros_app/shared_preferences/preference.dart';
 import 'package:meseros_app/theme/app_theme.dart';
 import 'package:provider/provider.dart';
-import 'package:meseros_app/shared_preferences/preference.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +54,7 @@ class MyApp extends StatelessWidget {
         'preferences': (_) => SettingsScreen(),
         '/': (_) => HomeScreen(),
         'table-details': (_) => TableDetails(),
+        'product-details': (_) => ProductDetails(),
       },
     );
   }

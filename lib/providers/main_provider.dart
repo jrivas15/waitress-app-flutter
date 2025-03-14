@@ -1,7 +1,8 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:meseros_app/models/waitress_model.dart';
 import 'package:meseros_app/shared_preferences/preference.dart';
 
 class MainProvider extends ChangeNotifier {
@@ -12,6 +13,9 @@ class MainProvider extends ChangeNotifier {
   String backend = '${Preferences.ipServer}:${Preferences.port}';
   List<String> waitresses = [];
   int _currentOptNav = 0;
+  WaitressModel? waitress;
+  Logger logger = Logger();
+
   MainProvider() {
     getMeseros();
   }
@@ -36,13 +40,15 @@ class MainProvider extends ChangeNotifier {
       // print(data);
       notifyListeners();
     } catch (e) {
-      print(e);
+      logger.e(e);
     }
   }
 
   Future<bool> validateUser(String user, String? passwd) async {
-    final url = Uri.http(backend, 'tables/validate-waitress',
-        {'name': user, 'password': passwd ?? ''});
+    final url = Uri.http(backend, 'tables/validate-waitress', {
+      'name': user,
+      'password': passwd ?? '',
+    });
 
     // final Map<String, String> data = {'usuario': user, 'password': passwd};
     try {
@@ -50,8 +56,10 @@ class MainProvider extends ChangeNotifier {
       if (response.statusCode != 200) {
         return false;
       }
+      waitress = waitressModelFromJson(response.body);
       return true;
     } catch (error) {
+      logger.e(error);
       return false;
     }
   }

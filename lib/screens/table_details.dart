@@ -36,7 +36,7 @@ class _SwitchScreen extends StatelessWidget {
       case 0:
         return Column(children: [_InfoTable(table: table), SelectProducts()]);
       case 1:
-        return OrderDetails();
+        return OrderDetails(table: table);
       default:
         return const SelectProducts();
     }

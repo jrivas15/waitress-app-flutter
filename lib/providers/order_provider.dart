@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:meseros_app/models/modifier_model.dart';
 import 'package:meseros_app/models/order_item_model.dart';
 import 'package:meseros_app/models/order_model.dart';
 import 'package:meseros_app/models/product_model.dart';
+import 'package:meseros_app/models/table_model.dart';
 import 'package:meseros_app/shared_preferences/preference.dart';
 import 'package:logger/logger.dart';
 import 'dart:convert';
@@ -11,6 +13,8 @@ class OrderProvider extends ChangeNotifier {
   String backend = '${Preferences.ipServer}:${Preferences.port}';
   OrderModel? currentOrder;
   List<OrderItemModel> orderItems = [];
+  double totalOrderPrice = 0;
+  int currOrderItemID = 0;
   final Logger logger = Logger();
 
   addOrderItem(ProductModel product) {
@@ -20,6 +24,7 @@ class OrderProvider extends ChangeNotifier {
     } else {
       addItemToOrderList(product);
     }
+    calculateTotalOrderPrice();
     notifyListeners();
   }
 
@@ -31,6 +36,7 @@ class OrderProvider extends ChangeNotifier {
       state: "pending",
       product: product,
       subtotal: product.price,
+      modifiers: [],
     );
     orderItems.add(item);
   }
@@ -39,9 +45,11 @@ class OrderProvider extends ChangeNotifier {
     for (OrderItemModel item in orderItems) {
       if (item.id == productID) {
         item.quantity++;
+        item.subtotal = item.quantity * item.product.price;
         break;
       }
     }
+    calculateTotalOrderPrice();
     notifyListeners();
   }
 
@@ -55,7 +63,9 @@ class OrderProvider extends ChangeNotifier {
           );
         } else {
           item.quantity--;
+          item.subtotal = item.quantity * item.product.price;
         }
+        calculateTotalOrderPrice();
         notifyListeners();
         break;
       }
@@ -66,6 +76,19 @@ class OrderProvider extends ChangeNotifier {
     logger.i('RESETTING ORDER-------------');
     currentOrder = null;
     orderItems = [];
+    totalOrderPrice = 0;
+    notifyListeners();
+  }
+
+  calculateTotalOrderPrice() {
+    final List<double> subtotals =
+        orderItems.map((item) => item.subtotal).toList();
+    subtotals.isNotEmpty
+        ? totalOrderPrice = subtotals.reduce(
+          (value, element) => value + element,
+        )
+        : totalOrderPrice = 0;
+
     notifyListeners();
   }
 
@@ -82,7 +105,7 @@ class OrderProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (error) {
-      print(error);
+      logger.e(error);
     }
   }
 
@@ -96,6 +119,7 @@ class OrderProvider extends ChangeNotifier {
         orderItems = [];
       } else {
         orderItems = orderItemModelFromJson(response.body);
+        logger.i(orderItemModelToJson(orderItems));
       }
       notifyListeners();
     } catch (error) {
@@ -103,38 +127,82 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  updateOrderItems() async {
-    final url = Uri.http(backend, 'orders/get-items', {
-      "orderID": orderID.toString(),
-    });
+  updateOrderItemModifiers(
+    ProductModel product,
+    List<ModifierModel> modifiers,
+    String note,
+  ) {
+    for (OrderItemModel item in orderItems) {
+      if (item.id == currOrderItemID) {
+        item.modifiers = modifiers;
+        item.note = note;
+        logger.d(item.modifiers);
+        break;
+      }
+    }
+    notifyListeners();
+  }
+
+  List<Map<String, dynamic>> _dataToOrderRequest() {
+    //Method to set data to model requiered
+    return orderItems
+        .map(
+          (item) => {
+            "id": item.id,
+            "quantity": item.quantity,
+            "state": item.state,
+            "note": item.note,
+            "product": item.product.id,
+            "subtotal": item.subtotal,
+            "modifiers": item.modifiers,
+          },
+        )
+        .toList();
+  }
+
+  newOrder({required TableModel table}) async {
+    logger.i(table.order);
+    final url = Uri.http(backend, 'orders/new');
     try {
-      final response = await http.post(url);
+      final response = await http.post(
+        url,
+        body: json.encode({
+          "waitressID": table.waitress,
+          "table": table.id,
+          "orderItems": _dataToOrderRequest(),
+        }),
+      );
       if (response.statusCode != 200) {
-        orderItems = [];
-      } else {
-        orderItems = orderItemModelFromJson(response.body);
+        return false;
       }
-      notifyListeners();
-    } catch (error) {
-      logger.e(error);
+    } catch (e) {
+      logger.e(e);
+      return false;
     }
+    return true;
   }
 
-  Future<void> createOrder(OrderModel order) async {
-    final url = Uri.http(backend, 'orders/create');
+  Future<bool> updateOrderItems() async {
+    final int orderID = orderItems[0].order ?? 0;
+
+    final url = Uri.http(backend, 'orders/update-items');
+
     try {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(order.toJson()),
+        body: jsonEncode({
+          "order": orderID,
+          "orderItems": _dataToOrderRequest(),
+        }),
       );
-      if (response.statusCode == 201) {
-        logger.i('Order created successfully');
-      } else {
-        logger.e('Failed to create order: ${response.body}');
+      if (response.statusCode != 200) {
+        return false;
       }
     } catch (error) {
-      logger.e('Error creating order: $error');
+      logger.e(error);
+      return false;
     }
+    return true;
   }
 }

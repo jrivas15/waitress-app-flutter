@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:meseros_app/models/table_model.dart';
 import 'package:meseros_app/models/zone_model.dart';
 import 'package:meseros_app/shared_preferences/preference.dart';
@@ -10,7 +11,7 @@ class TableProvider extends ChangeNotifier {
   ZonesModel _selectedZone = ZonesModel(id: 0, name: 'Todas');
   List<ZonesModel> zones = [];
   int _currentOptNav = 0;
-
+  Logger logger = Logger();
   //*------- NAV BAR ---------
   int get currentOptNav => _currentOptNav;
 
@@ -40,7 +41,7 @@ class TableProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (error) {
-      print(error);
+      logger.e(error);
     }
   }
 
@@ -55,7 +56,7 @@ class TableProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (error) {
-      print(error);
+      logger.e(error);
     }
   }
 }

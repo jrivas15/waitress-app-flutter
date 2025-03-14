@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meseros_app/models/table_model.dart';
 import 'package:meseros_app/models/zone_model.dart';
-import 'package:meseros_app/providers/product_provider.dart';
 import 'package:meseros_app/providers/table_provider.dart';
 import 'package:meseros_app/theme/app_theme.dart';
 import 'package:meseros_app/widgets/custom_table.dart';
@@ -70,11 +69,6 @@ class _ZoneCategories extends StatelessWidget {
             onTap: () {
               tableProvider.selectedZone = zones[i];
               tableProvider.getTablesByZone(zones[i].id);
-              final productProvider = Provider.of<ProductProvider>(
-                context,
-                listen: false,
-              );
-              productProvider.getCategories();
             },
             child: Container(
               height: 10,

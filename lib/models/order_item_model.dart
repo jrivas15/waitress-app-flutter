@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 
+import 'package:meseros_app/models/modifier_model.dart';
 import 'package:meseros_app/models/product_model.dart';
 
 List<OrderItemModel> orderItemModelFromJson(String str) =>
@@ -21,6 +22,7 @@ class OrderItemModel {
   dynamic note;
   dynamic state;
   ProductModel product;
+  List<ModifierModel> modifiers;
   double subtotal;
 
   OrderItemModel({
@@ -31,6 +33,7 @@ class OrderItemModel {
     required this.state,
     required this.product,
     required this.subtotal,
+    required this.modifiers,
   });
 
   factory OrderItemModel.fromJson(Map<String, dynamic> json) => OrderItemModel(
@@ -41,6 +44,9 @@ class OrderItemModel {
     note: json["note"],
     product: ProductModel.fromJson(json["product"]),
     subtotal: json["subtotal"],
+    modifiers: List<ModifierModel>.from(
+      json["modifiers"].map((x) => ModifierModel.fromJson(x)),
+    ),
   );
 
   Map<String, dynamic> toJson() => {
@@ -49,6 +55,7 @@ class OrderItemModel {
     "order": order,
     "state": state,
     "note": note,
+    "modifiers": List<dynamic>.from(modifiers.map((x) => x.toJson())),
     "product": product.toJson(),
     "subtotal": subtotal,
   };
