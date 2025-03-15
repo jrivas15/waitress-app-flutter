@@ -72,7 +72,7 @@ class _ZoneCategories extends StatelessWidget {
             },
             child: Container(
               height: 10,
-              width: size.width * 0.27,
+              width: size.width * 0.3,
               alignment: Alignment.center,
               decoration:
                   selectedZone.id == zones[i].id

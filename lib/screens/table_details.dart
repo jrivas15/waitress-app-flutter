@@ -4,7 +4,6 @@ import 'package:meseros_app/providers/order_provider.dart';
 import 'package:meseros_app/providers/table_provider.dart';
 import 'package:meseros_app/screens/order_details.dart';
 import 'package:meseros_app/screens/select_products.dart';
-// import 'package:meseros_app/theme/app_theme.dart';
 import 'package:meseros_app/widgets/custom_table.dart';
 import 'package:provider/provider.dart';
 
@@ -15,9 +14,51 @@ class TableDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final TableModel table =
         ModalRoute.of(context)!.settings.arguments as TableModel;
-    return Scaffold(
-      body: SafeArea(child: _SwitchScreen(table: table)),
-      bottomNavigationBar: _TableNavigationBart(),
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
+    final tableProvider = Provider.of<TableProvider>(context, listen: true);
+    navToHome() => Navigator.of(context).pop();
+
+    return PopScope(
+      canPop: false,
+      //TODO: REVISAR POP INVOKED
+      // onPopInvoked: (didPop) async {
+      //   if (!didPop) {
+      //     bool? salir = await showDialog(
+      //       context: context,
+      //       builder:
+      //           (context) => AlertDialog(
+      //             title: Text("¿Salir?"),
+      //             content: Text("¿Seguro que quieres salir de esta pantalla?"),
+      //             actions: [
+      //               TextButton(
+      //                 onPressed: () => Navigator.of(context).pop(false),
+      //                 style: TextButton.styleFrom(
+      //                   foregroundColor: AppTheme.primaryColor,
+      //                 ),
+      //                 child: Text("No"),
+      //               ),
+      //               TextButton(
+      //                 onPressed: () => Navigator.of(context).pop(true),
+      //                 style: TextButton.styleFrom(
+      //                   foregroundColor: AppTheme.primaryColor,
+      //                 ),
+      //                 child: Text("Sí"),
+      //               ),
+      //             ],
+      //           ),
+      //     );
+
+      //     if (salir == true) {
+      //       tableProvider.resetTables();
+      //       orderProvider.resetOrder();
+      //       navToHome(); // Permite salir si el usuario confirma
+      //     }
+      //   }
+      // },
+      child: Scaffold(
+        body: SafeArea(child: _SwitchScreen(table: table)),
+        bottomNavigationBar: _TableNavigationBart(),
+      ),
     );
   }
 }
@@ -97,6 +138,7 @@ class _InfoTable extends StatelessWidget {
         children: [
           BackButton(
             onPressed: () {
+              tableProvider.resetTables();
               Navigator.pushReplacementNamed(context, '/');
               final orderProvider = Provider.of<OrderProvider>(
                 context,

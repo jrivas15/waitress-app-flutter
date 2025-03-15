@@ -20,25 +20,17 @@ class SelectProducts extends StatelessWidget {
         children: [
           Text('Categorias', style: AppTheme.titleStyle),
           CategoryCarrousel(categories: categories),
+          const SizedBox(height: 15),
           Expanded(
-            child: GridView.count(
-              mainAxisSpacing: 10,
-
-              crossAxisCount: 3,
-              children:
-                  productProvider.products
-                      .map(
-                        (product) => Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            // vertical: 20,
-                          ),
-                          child: IntrinsicHeight(
-                            child: _ProductCard(product: product),
-                          ),
-                        ),
-                      )
-                      .toList(),
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 5,
+                runSpacing: 10,
+                children:
+                    productProvider.products
+                        .map((product) => _ProductCard(product: product))
+                        .toList(),
+              ),
             ),
           ),
         ],
@@ -56,24 +48,27 @@ class _ProductCard extends StatelessWidget {
     final orderProvider = Provider.of<OrderProvider>(context, listen: false);
     return GestureDetector(
       onTap: () {
-        print(product.name);
-        print('${orderProvider.backend}${product.image}');
+        // print(product.name);
+        // print('${orderProvider.backend}${product.image}');
         orderProvider.addOrderItem(product);
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          width: 130,
-          height: 130,
+      child: Container(
+        width: 130,
+        height: 130,
 
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [AppTheme.boxShadowCards],
-          ),
-          child: Column(
-            children: [
-              Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [BoxShadow(blurRadius: 7, color: Colors.black12)],
+        ),
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+              ),
+              child: Container(
                 width: double.infinity,
                 height: 80,
                 color: const Color.fromARGB(96, 152, 152, 152),
@@ -88,33 +83,33 @@ class _ProductCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5),
-                child: Text(
-                  product.name,
-                  style: TextStyle(
-                    overflow: TextOverflow.ellipsis,
-                    fontWeight: FontWeight.bold,
-                  ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 5),
+              child: Text(
+                product.name,
+                style: TextStyle(
+                  overflow: TextOverflow.ellipsis,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      '\$ ${formatNumber(product.price)}',
-                      style: TextStyle(
-                        color: AppTheme.primaryColor,
-                        fontWeight: FontWeight.bold,
-                      ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    '\$ ${formatNumber(product.price)}',
+                    style: TextStyle(
+                      color: AppTheme.primaryColor,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

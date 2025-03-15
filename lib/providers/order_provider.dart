@@ -205,4 +205,24 @@ class OrderProvider extends ChangeNotifier {
     }
     return true;
   }
+
+  updateOrderItemsState({required int orderID,required int state}) async {
+    final url = Uri.http(backend, 'orders/update-order-state');
+    try {
+      final response = await http.patch(
+        url,
+        body: json.encode({
+          "orderID": orderID,
+          "state": state,
+        }),
+      );
+      if (response.statusCode != 200) {
+        return false;
+      }
+    } catch (e) {
+      logger.e(e);
+      return false;
+    }
+    return true;
+  }
 }

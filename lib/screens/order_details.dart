@@ -15,7 +15,11 @@ class OrderDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     final orderProvider = Provider.of<OrderProvider>(context);
 
-    navToHome() => Navigator.pushReplacementNamed(context, '/');
+    navToHome() {
+      Provider.of<TableProvider>(context, listen: false).resetTables();
+      orderProvider.resetOrder();
+      Navigator.pushReplacementNamed(context, '/');
+    }
 
     sendBill() async {
       bool ok = await orderProvider.updateOrderItems();
@@ -26,6 +30,8 @@ class OrderDetails extends StatelessWidget {
       final mainProvider = Provider.of<MainProvider>(context, listen: false);
       table.waitress = mainProvider.waitress!.id;
       orderProvider.newOrder(table: table);
+      orderProvider.resetOrder();
+      navToHome();
     }
 
     return Padding(

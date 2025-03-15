@@ -9,14 +9,6 @@ class StatsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = [
-      {"name": "Mesas", "value": "99"},
-      {"name": "Disponibles", "value": "50"},
-      {"name": "Ocupadas", "value": "49"},
-      {"name": "A foro", "value": "95%"},
-      {"name": "Ocupadas", "value": "49"},
-      {"name": "Ocupadas", "value": "49"},
-    ];
     final mainProvider = Provider.of<MainProvider>(context);
     final stats = mainProvider.stats;
     return Scaffold(
@@ -57,7 +49,7 @@ class StatsScreen extends StatelessWidget {
 class _SimpleStat extends StatelessWidget {
   final String name;
   final dynamic value;
-  const _SimpleStat({super.key, required this.name, required this.value});
+  const _SimpleStat({required this.name, required this.value});
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +70,7 @@ class _SimpleStat extends StatelessWidget {
               // color: Colors.amberAccent,
               child: Center(
                 child: Text(
-                  '${value}',
+                  value.toString(),
                   style: TextStyle(
                     fontSize: 50,
                     color: AppTheme.primaryColor,

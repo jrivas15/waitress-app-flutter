@@ -12,11 +12,20 @@ class TableProvider extends ChangeNotifier {
   List<ZonesModel> zones = [];
   int _currentOptNav = 0;
   Logger logger = Logger();
+  int? _gruopOptionsRadioStateProducts = 1;
+
   //*------- NAV BAR ---------
   int get currentOptNav => _currentOptNav;
 
   set currentOptNav(int currentIndex) {
     _currentOptNav = currentIndex;
+    notifyListeners();
+  }
+
+  //*------- radio options table ---------
+  int? get gruopOptionsRadioStateProducts => _gruopOptionsRadioStateProducts;
+  set gruopOptionsRadioStateProducts(int? currentOption) {
+    _gruopOptionsRadioStateProducts = currentOption;
     notifyListeners();
   }
   //*------- Zones ---------
@@ -58,5 +67,12 @@ class TableProvider extends ChangeNotifier {
     } catch (error) {
       logger.e(error);
     }
+  }
+
+  resetTables() {
+    logger.d('RESETTING TABLES');
+    selectedZone.id = 0;
+    tables = [];
+    notifyListeners();
   }
 }
